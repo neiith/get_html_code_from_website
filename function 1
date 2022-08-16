@@ -1,0 +1,27 @@
+import requests
+from bs4 import BeautifulSoup
+import time
+import csv
+import pandas as pd
+from selenium.webdriver import Chrome
+from selenium.webdriver.chrome.service import Service as ChromeService
+import re
+from pathlib import Path
+from datetime import datetime
+service = ChromeService(r'C:\Users\admin\Desktop\do kursu\chromedriver_win32\chromedriver.exe') # lub ./chromedriver.exe w przypadku Windows
+browser = Chrome(service=service)
+
+def get_html_code(post_name: str, page_numebr: int): 
+    global browser   
+    post = post_name[5:]
+    URL = 'https://nofluffjobs.com/pl/?criteria=keyword%3D%27data%20{}%27&page={}'.format(post, page_numebr)
+    #print(URL)
+    browser.get(URL)   #Selenium 
+    #r = requests.get(URL) #BeautifulSoup
+    time.sleep(1)
+    #soup = BeautifulSoup(r.text,'html.parser')
+    html = browser.page_source
+    soup = BeautifulSoup(html,'html.parser')
+    #text = str(soup)
+    #return soup.prettify()
+    return soup
