@@ -1,0 +1,82 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt 
+import pathlib as Path
+from matplotlib import ticker
+from matplotlib import rcParams
+
+data_path = r'C:\Users\admin\CodersLab - Kurs - Python - Analiza danych\CodersLab_Warsztat\data\processed\job_offers.csv'
+df = pd.read_csv(data_path, sep = ';')
+df['counter'] = 1
+aa = pd.pivot_table(data=df, index=['job'], columns=["counter"], aggfunc=['count'])
+font1 = {"size": 20}
+
+def label_function(val):
+    return f'{val / 100 * len(df):.0f}\n{val:.0f}%'
+
+
+#'%1.0f%%' we use when we only want to get %
+explode = (0.05, 0.15, 0.05)
+aa = df.groupby(['job']).sum().plot(
+    kind='pie', y = 'counter', autopct = label_function, figsize = [10, 8], startangle=60, colors = ["lime", "darkorange", "plum"],
+    title = "Oferty pracy dla poszczególnych stanowisk", explode = explode, center = (0, 0), normalize=True)
+
+aa.legend(title='Job', bbox_to_anchor=(1.2, 0), loc='lower left', fontsize = 'large', title_fontsize = 'large')
+aa.set_title(label = 'Oferty pracy dla poszczególnych stanowisk', fontdict = font1)
+
+plt.savefig("ofert pracy.png", transparent = True, bbox_inches='tight')
+plt.show()
+
+bb = pd.pivot_table(data=df, index=['job'], columns=['location city'], values = ['salary_avg'], aggfunc=['mean'])
+font1 = {"size": 60,}
+
+
+ax = bb.plot(
+     kind='barh', stacked=False, figsize = [30, 30])   #Stacked responsible for visualisation barh
+
+ax.set_xlabel('Salary of post', fontdict = font1, labelpad = 50)
+ax.set_ylabel('Job', fontdict = font1, labelpad = 50)
+ax.tick_params(axis = 'both', which = 'major', labelsize = 50)
+ax.legend(title='Location city', bbox_to_anchor=(1.2, 0), loc='lower left', fontsize = 'xx-large', title_fontsize = 'xx-large')
+ax.xaxis.grid(True, ls = (0, (1, 10)))
+# shows x-axis in millions instead of scientific notation
+ax.xaxis.set_major_formatter(ticker.EngFormatter())
+ax.set_title(label = 'Wynagrodzenie w miastach', fontdict = font1)
+
+for spine in ['top', 'right']:
+    ax.spines[spine].set_visible(False)
+
+plt.savefig("wynagrodzenie w miastach.png", transparent = True, bbox_inches='tight')
+
+cc = pd.pivot_table(data=df, index=['job'], columns=['location city'], values = ['company'], aggfunc=['count'])
+color  = ["darkblue", 'blue', 'mediumslateblue', 'thistle', 'blueviolet', 'darkviolet', 'plum', 'hotpink', 'crimson']
+font2 = {"size": 20}
+ax = cc.plot(
+     kind='bar', stacked=True,
+     title='Ogłoszenia w poszczególnych miastach', figsize = [15, 15], color = color)
+plt.rcParams['font.size'] = 20
+ax.invert_xaxis() # put destinations with more passengers on top
+# formatting
+ax.set(xlabel='Ilość ogłoszeń', ylabel='Stanowisko')
+ax.set_xlabel(xlabel='Ilość ogłoszeń', labelpad = 50)
+ax.set_ylabel(ylabel='Stanowisko', labelpad = 50)
+ax.set_title(label = 'Ogłoszenia w poszczególnych miastach', fontdict = font2)
+ax.yaxis.grid(True, ls = (0, (1, 1)))
+#ax.bar_label(container = cc)
+rcParams['axes.titlepad'] = 70 
+#ax.legend(title='location city')
+ax.legend(title='Miejsce pracy', bbox_to_anchor=(1.2, 0), loc='lower left', fontsize = 'large', title_fontsize = 'small') 
+
+for spine in ['top', 'right']:
+    ax.spines[spine].set_visible(False)
+
+
+for container in ax.containers:
+    tt = ax.bar_label(container, size = 10)
+
+plt.savefig("ogłoszenia w poszczególnych miastach.png", transparent = True, bbox_inches='tight')
+
+pd.pivot_table(data=df, index=[], columns=['location city'], values = ['salary high'], aggfunc=['max'])
+pd.pivot_table(data=df, index=['is_senior'], columns=[], values = ['salary_avg'], aggfunc=['max', 'min', 'mean', 'median'])
+pd.pivot_table(data=df, index=['job'], columns=[], values = ['salary low'], aggfunc=['min'])
+pd.pivot_table(data=df, index=['job'], columns=['location city'], values = ['salary low'], aggfunc=['min'])
